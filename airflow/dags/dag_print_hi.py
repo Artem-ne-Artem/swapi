@@ -7,7 +7,7 @@ from airflow.operators.empty import EmptyOperator
 from airflow.operators.python import PythonOperator
 
 owner = "airflow_admin"
-dag_id = "simple_dag"
+dag_id = "dag_print_hi"
 
 args = {
     "owner": owner

@@ -6,10 +6,17 @@ import clickhouse_connect
 from airflow.utils.dates import days_ago
 from airflow.operators.dummy_operator import DummyOperator
 
+args = {"owner": "airflow_admin"}
+
+
 dag = DAG(
-    'dag'
+    dag_id='dag_dummy'
+    ,default_args=args
     ,schedule_interval=timedelta(days=1)
     ,start_date=days_ago(1)
+    ,catchup=False
+    ,tags=["test"]
+    ,is_paused_upon_creation=False
 )
 
 t1 = DummyOperator(task_id='task_1', dag=dag)

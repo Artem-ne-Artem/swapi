@@ -1,3 +1,8 @@
+"""
+### DAG documentation
+This is simple DAG
+"""
+
 import logging
 import pendulum
 import datetime
@@ -35,9 +40,15 @@ with DAG(
     ,concurrency=16                         # Макс. число задач одновременно выполняющихся задач внутри DAG.
     # ,dagrun_timeout=None                    # Таймаут на весь DAG (если он выполняется слишком долго)
     # ,doc_md=None                            # Документация в Markdown, отображается прямо в Airflow UI.
+    ,doc_md = """
+            ### DAG documentation
+            This is very simple DAG
+            """
     # ,params={"mode": "daily"}               # Словарь пользовательских параметров, которые можно переопределять при запуске.
     ,is_paused_upon_creation=True           # Создаётся ли DAG сразу на паузе (True по умолчанию).
 ) as dag:
+    # dag.doc_md = __doc__
+
     start = EmptyOperator(
         task_id="start"
     )

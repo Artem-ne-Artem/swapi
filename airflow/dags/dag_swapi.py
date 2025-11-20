@@ -3,10 +3,21 @@ from airflow import DAG
 from airflow.operators.python import PythonOperator
 from airflow.operators.empty import EmptyOperator
 from airflow.providers.postgres.hooks.postgres import PostgresHook
-from swapi_import_raw import (get_init_database, get_init_schemas, get_drop_schemas, get_create_table_and_load_data, get_create_table_and_load_data,
-                              get_create_table_and_load_data, get_create_table_and_load_data, get_create_table_and_load_data, get_create_table_and_load_data
-                              )
-from swapi_create_stg import get_create_stg_vehicles
+from swapi_import_raw import (
+    get_init_database
+    ,get_init_schemas
+    ,get_drop_schemas
+    ,get_create_table_and_load_data
+    ,get_create_table_and_load_data
+    ,get_create_table_and_load_data
+    ,get_create_table_and_load_data
+    ,get_create_table_and_load_data
+    ,get_create_table_and_load_data
+)
+from swapi_create_stg import (
+    get_create_stg_vehicles
+    ,get_create_stg_planets
+)
 
 
 args = {
@@ -81,10 +92,22 @@ with DAG(
         op_args=["starships"],
     )
 
-    create_stg_vehicles= PythonOperator(
+
+    blank = EmptyOperator(
+        task_id="blank"
+    )
+
+
+    create_stg_vehicles = PythonOperator(
         task_id="create_stg_vehicles",
         python_callable=get_create_stg_vehicles,
     )
+
+    create_stg_planets = PythonOperator(
+        task_id="create_stg_planets",
+        python_callable=get_create_stg_planets,
+    )
+
 
     end = EmptyOperator(
         task_id="end"
@@ -96,6 +119,7 @@ with DAG(
     >> init_schemas
     >> drop_schemas
     >> [import_people, import_planets, import_films, import_species, import_vehicles, import_starships]
-    >> create_stg_vehicles
+    >> blank
+    >> [create_stg_vehicles, create_stg_planets]
     >> end
 )

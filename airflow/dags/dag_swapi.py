@@ -1,0 +1,101 @@
+from datetime import datetime, timedelta
+from airflow import DAG
+from airflow.operators.python import PythonOperator
+from airflow.operators.empty import EmptyOperator
+from airflow.providers.postgres.hooks.postgres import PostgresHook
+from swapi_import_raw import (get_init_database, get_init_schemas, get_drop_schemas, get_create_table_and_load_data, get_create_table_and_load_data,
+                              get_create_table_and_load_data, get_create_table_and_load_data, get_create_table_and_load_data, get_create_table_and_load_data
+                              )
+from swapi_create_stg import get_create_stg_vehicles
+
+
+args = {
+    "owner": "owner"
+    ,"retries":5
+    ,"retry_delay": timedelta(seconds=5)
+}
+
+with DAG(
+    dag_id="swapi",
+    description="Проект Swappi",
+    start_date=datetime(2025, 11, 20),
+    default_args=args,
+    # schedule_interval="0 * * * *",
+    schedule_interval=None,
+    catchup=False,
+    tags=["swapi"],
+) as dag:
+
+    start = EmptyOperator(
+        task_id="start"
+    )
+
+    init_db = PythonOperator(
+        task_id="init_database",
+        python_callable=get_init_database,
+    )
+
+    init_schemas = PythonOperator(
+        task_id="init_schemas",
+        python_callable=get_init_schemas,
+    )
+
+    drop_schemas = PythonOperator(
+        task_id="drop_schemas",
+        python_callable=get_drop_schemas,
+    )
+
+    import_people = PythonOperator(
+        task_id="import_people",
+        python_callable=get_create_table_and_load_data,
+        op_args=["people"],
+    )
+
+    import_planets = PythonOperator(
+        task_id="import_planets",
+        python_callable=get_create_table_and_load_data,
+        op_args=["planets"],
+    )
+
+    import_films = PythonOperator(
+        task_id="import_films",
+        python_callable=get_create_table_and_load_data,
+        op_args=["films"],
+    )
+
+    import_species = PythonOperator(
+        task_id="import_species",
+        python_callable=get_create_table_and_load_data,
+        op_args=["species"],
+    )
+
+    import_vehicles = PythonOperator(
+        task_id="import_vehicles",
+        python_callable=get_create_table_and_load_data,
+        op_args=["vehicles"],
+    )
+
+    import_starships = PythonOperator(
+        task_id="import_starships",
+        python_callable=get_create_table_and_load_data,
+        op_args=["starships"],
+    )
+
+    create_stg_vehicles= PythonOperator(
+        task_id="create_stg_vehicles",
+        python_callable=get_create_stg_vehicles,
+    )
+
+    end = EmptyOperator(
+        task_id="end"
+    )
+
+(
+    start
+    >> init_db
+    >> init_schemas
+    >> drop_schemas
+    >> [import_people, import_planets, import_films, import_species, import_vehicles, import_starships]
+    >> create_stg_vehicles
+    >> end
+)

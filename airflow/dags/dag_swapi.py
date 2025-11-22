@@ -3,10 +3,13 @@ from airflow import DAG
 from airflow.operators.python import PythonOperator
 from airflow.operators.empty import EmptyOperator
 from airflow.providers.postgres.hooks.postgres import PostgresHook
-from swapi_import_raw import (
+
+from swapi_init_db_schemas import (
     get_init_database
     ,get_init_schemas
-    ,get_drop_schemas
+)
+from swapi_create_raw import (
+    get_drop_schemas
     ,get_create_table_and_load_data
     ,get_create_table_and_load_data
     ,get_create_table_and_load_data

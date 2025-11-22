@@ -1,9 +1,6 @@
 from config.postgres_config import DB_CONN
 from config.logger_config import get_logger
 from sqlalchemy import create_engine, text
-import psycopg2
-import json
-import requests
 
 
 logger = get_logger()

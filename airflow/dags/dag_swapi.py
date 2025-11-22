@@ -11,15 +11,14 @@ from swapi_init_db_schemas import (
 from swapi_create_raw import (
     get_drop_schemas
     ,get_create_table_and_load_data
-    ,get_create_table_and_load_data
-    ,get_create_table_and_load_data
-    ,get_create_table_and_load_data
-    ,get_create_table_and_load_data
-    ,get_create_table_and_load_data
 )
 from swapi_create_stg import (
     get_create_stg_vehicles
     ,get_create_stg_planets
+    ,get_create_stg_films
+    ,get_create_stg_peoples
+    ,get_create_stg_species
+    ,get_create_stg_starships
 )
 
 
@@ -111,6 +110,26 @@ with DAG(
         python_callable=get_create_stg_planets,
     )
 
+    create_stg_films = PythonOperator(
+        task_id="create_stg_films",
+        python_callable=get_create_stg_films
+    )
+
+    create_stg_peoples = PythonOperator(
+        task_id="create_stg_peoples",
+        python_callable=get_create_stg_peoples
+    )
+
+    create_stg_species = PythonOperator(
+        task_id="create_stg_species",
+        python_callable=get_create_stg_species
+    )
+
+    create_stg_starships = PythonOperator(
+        task_id="create_stg_starships",
+        python_callable=get_create_stg_starships
+    )
+
 
     end = EmptyOperator(
         task_id="end"
@@ -123,6 +142,6 @@ with DAG(
     >> drop_schemas
     >> [import_people, import_planets, import_films, import_species, import_vehicles, import_starships]
     >> blank
-    >> [create_stg_vehicles, create_stg_planets]
+    >> [create_stg_vehicles, create_stg_planets, create_stg_films, create_stg_peoples, create_stg_species, create_stg_starships]
     >> end
 )

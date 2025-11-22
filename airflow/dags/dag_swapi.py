@@ -16,10 +16,11 @@ from swapi_create_stg import (
     get_create_stg_vehicles
     ,get_create_stg_planets
     ,get_create_stg_films
-    ,get_create_stg_peoples
+    ,get_create_stg_people
     ,get_create_stg_species
     ,get_create_stg_starships
 )
+from swapi_create_cdm import get_create_cdm_metric_leaders
 
 
 args = {
@@ -115,9 +116,9 @@ with DAG(
         python_callable=get_create_stg_films
     )
 
-    create_stg_peoples = PythonOperator(
-        task_id="create_stg_peoples",
-        python_callable=get_create_stg_peoples
+    create_stg_people = PythonOperator(
+        task_id="create_stg_people",
+        python_callable=get_create_stg_people
     )
 
     create_stg_species = PythonOperator(
@@ -128,6 +129,11 @@ with DAG(
     create_stg_starships = PythonOperator(
         task_id="create_stg_starships",
         python_callable=get_create_stg_starships
+    )
+
+    create_cdm_metric_leaders = PythonOperator(
+        task_id="create_cdm_metric_leaders",
+        python_callable=get_create_cdm_metric_leaders
     )
 
 
@@ -142,6 +148,7 @@ with DAG(
     >> drop_schemas
     >> [import_people, import_planets, import_films, import_species, import_vehicles, import_starships]
     >> blank
-    >> [create_stg_vehicles, create_stg_planets, create_stg_films, create_stg_peoples, create_stg_species, create_stg_starships]
+    >> [create_stg_vehicles, create_stg_planets, create_stg_films, create_stg_people, create_stg_species, create_stg_starships]
+    >> create_cdm_metric_leaders
     >> end
 )

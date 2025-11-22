@@ -21,7 +21,7 @@ def get_engine():
 def get_create_stg_vehicles():
     engine = get_engine()
     full_table = f"stg.vehicles"
-    with engine.connect() as conn:
+    with engine.begin() as conn:
         sql = f"""
         create table if not exists {full_table} as
         with vehicles as (
@@ -106,7 +106,7 @@ def get_create_stg_vehicles():
 def get_create_stg_planets():
     engine = get_engine()
     full_table = f"stg.planets"
-    with engine.connect() as conn:
+    with engine.begin() as conn:
         sql = f"""
         create table if not exists {full_table} as
         with planets as (
@@ -187,7 +187,7 @@ def get_create_stg_planets():
 def get_create_stg_films():
     engine = get_engine()
     full_table = f"stg.films"
-    with engine.connect() as conn:
+    with engine.begin() as conn:
         sql = f"""
         create table if not exists {full_table} as
         with films as (
@@ -261,7 +261,7 @@ def get_create_stg_films():
             ,episode_id
             ,string_agg(peoples_match[1], ',') as people_ids
         from
-            films, regexp_matches(characters, 'peoples/(\d+)/', 'g') as peoples_match
+            films, regexp_matches(characters, 'people/(\d+)/', 'g') as peoples_match
         group by
             1,2
         )
@@ -310,17 +310,17 @@ def get_create_stg_films():
     logger.info(f"✅ Таблица {full_table} создана")
 
 
-def get_create_stg_peoples():
+def get_create_stg_people():
     engine = get_engine()
-    full_table = f"stg.peoples"
-    with engine.connect() as conn:
+    full_table = f"stg.people"
+    with engine.begin() as conn:
         sql = f"""
         create table if not exists {full_table} as
         with people as (
         select
             id
             ,species
-            ,cast(case when mass = 'unknown' then null else replace(mass, ',', '.') end as float) as mass
+            ,cast(case when mass = 'unknown' then null else replace(mass, ',', '') end as float) as mass
             ,cast(regexp_replace(url, '.*/people/([0-9]+)/.*', E'\\\\1') as int) as people_id
             ,cast(case when height = 'unknown' then null else height end as int) as height
             ,birth_year
@@ -343,7 +343,7 @@ def get_create_stg_peoples():
         select 
             id
             ,people_id
-            ,string_agg(species_match[1], ',') as species_ids
+            ,string_agg(species_match[1], ',') AS species_ids
         from
             people, regexp_matches(species, 'species/(\d+)/', 'g') as species_match
         group by
@@ -354,7 +354,7 @@ def get_create_stg_peoples():
         select 
             id
             ,people_id
-            ,string_agg(homeworlds_match[1], ',') as homeworld_ids
+            ,string_agg(homeworlds_match[1], ',') AS homeworld_ids
         from
             people, regexp_matches(homeworld, 'planets/(\d+)/', 'g') as homeworlds_match
         group by
@@ -365,7 +365,7 @@ def get_create_stg_peoples():
         select 
             id
             ,people_id
-            ,string_agg(starships_match[1], ',') as starship_ids
+            ,string_agg(starships_match[1], ',') AS starship_ids
         from
             people, regexp_matches(starships, 'starships/(\d+)/', 'g') as starships_match
         group by
@@ -376,7 +376,7 @@ def get_create_stg_peoples():
         select 
             id
             ,people_id
-            ,string_agg(films_match[1], ',') as film_ids
+            ,string_agg(films_match[1], ',') AS film_ids
         from
             people, regexp_matches(films, 'films/(\d+)/', 'g') as films_match
         group by
@@ -387,7 +387,7 @@ def get_create_stg_peoples():
         select 
             id
             ,people_id
-            ,string_agg(vehicles_match[1], ',') as vehicle_ids
+            ,string_agg(vehicles_match[1], ',') AS vehicle_ids
         from
             people, regexp_matches(vehicles, 'vehicles/(\d+)/', 'g') as vehicles_match
         group by
@@ -443,7 +443,7 @@ def get_create_stg_peoples():
 def get_create_stg_species():
     engine = get_engine()
     full_table = f"stg.species"
-    with engine.connect() as conn:
+    with engine.begin() as conn:
         sql = f"""
         create table if not exists {full_table} as
         with species as (
@@ -541,7 +541,7 @@ def get_create_stg_species():
 def get_create_stg_starships():
     engine = get_engine()
     full_table = f"stg.starships"
-    with engine.connect() as conn:
+    with engine.begin() as conn:
         sql = f"""
         create table if not exists {full_table} as
         with starships as (

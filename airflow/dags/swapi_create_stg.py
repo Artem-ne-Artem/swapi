@@ -560,7 +560,7 @@ def get_create_stg_starships():
             ,cast(case when cargo_capacity = 'unknown' then null else cargo_capacity end as bigint) as cargo_capacity
             ,case when crew = 'unknown' then null else cast(replace(split_part(crew, '-', 1), ',', '') as float) end as crew
             ,cast(regexp_replace(url, '.*/starships/([0-9]+)/.*', E'\\\\1') as int) as starships_id
-            ,starship_class
+            ,initcap(starship_class) as starship_class
             ,manufacturer
             ,films
             ,cast(case when max_atmosphering_speed in ('unknown', 'n/a') then null else rtrim(max_atmosphering_speed, 'km') end as bigint) as max_atmosphering_speed

@@ -3,7 +3,6 @@ from airflow import DAG
 from airflow.operators.python import PythonOperator
 from airflow.operators.empty import EmptyOperator
 from airflow.providers.postgres.hooks.postgres import PostgresHook
-
 from swapi_init_db_schemas import (
     get_init_database
     ,get_init_schemas
@@ -20,7 +19,10 @@ from swapi_create_stg import (
     ,get_create_stg_species
     ,get_create_stg_starships
 )
-from swapi_create_cdm import get_create_cdm_metric_leaders
+from swapi_create_cdm import (
+    get_create_cdm_metric_leaders
+    ,get_create_cdm_starships
+)
 
 
 args = {
@@ -95,11 +97,9 @@ with DAG(
         op_args=["starships"],
     )
 
-
-    blank = EmptyOperator(
-        task_id="blank"
+    blank_stg = EmptyOperator(
+        task_id="blank_stg"
     )
-
 
     create_stg_vehicles = PythonOperator(
         task_id="create_stg_vehicles",
@@ -131,15 +131,24 @@ with DAG(
         python_callable=get_create_stg_starships
     )
 
+    blank_cdm = EmptyOperator(
+        task_id="blank_cdm"
+    )
+
     create_cdm_metric_leaders = PythonOperator(
         task_id="create_cdm_metric_leaders",
         python_callable=get_create_cdm_metric_leaders
     )
 
+    create_cdm_starships = PythonOperator(
+        task_id="create_cdm_starships",
+        python_callable=get_create_cdm_starships
+    )
 
     end = EmptyOperator(
         task_id="end"
     )
+
 
 (
     start
@@ -147,8 +156,9 @@ with DAG(
     >> init_schemas
     >> drop_schemas
     >> [import_people, import_planets, import_films, import_species, import_vehicles, import_starships]
-    >> blank
+    >> blank_stg
     >> [create_stg_vehicles, create_stg_planets, create_stg_films, create_stg_people, create_stg_species, create_stg_starships]
-    >> create_cdm_metric_leaders
+    >> blank_cdm
+    >> [create_cdm_metric_leaders, create_cdm_starships]
     >> end
 )

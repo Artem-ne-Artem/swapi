@@ -15,4 +15,9 @@ Shema: https://swapi.dev/api/<resource>/schema
 * metabase:v0.56.9
 
 ### Схема процесса
-![alt text](airflow/pictures/swapi_process_shema.png)
+![swapi_process_shema](https://github.com/user-attachments/assets/4433d175-dc19-48aa-9152-6a638cd9fb40)
+
+* С помощью Airflow выгружаем данные из источника API в RAW слой Postgres.
+* Из RAW слоя Airflow трансформирует и загружает в слой STG Postgres.
+* Из STG слоя Airflow формирует слой CDM Postgres.
+* На базе CDM слоя MetaBase строит отчёт.

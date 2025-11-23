@@ -1,6 +1,6 @@
 # SWAPI
 
-(images/star_wars_logo.jpeg)
+![This is an alt text.](/images/star_wars_logo.jpeg "STAR WARS LOGO")
 
 API «Звёздных войн», или «swapi» — это источник для всех данных канонической вселенной «Звёздных войн»!
 
@@ -18,7 +18,7 @@ Shema: https://swapi.dev/api/<resource>/schema
 * metabase:v0.56.9
 
 ### Схема процесса
-![swapi_process_shema](swapi_process_shema.jpg)
+![This is an alt text.](/images/swapi_process_schema.jpg "SWAPI process schema")
 
 * С помощью Airflow выгружаем данные из источника API в RAW слой Postgres.
 * Из RAW слоя Airflow трансформирует и загружает в слой STG Postgres.

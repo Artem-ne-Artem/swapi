@@ -24,4 +24,5 @@ API «Звёздных войн», или «swapi» — это источник 
 
 
 Documentation https://swapi.dev/documentation#intro
+
 Shema: https://swapi.dev/api/<resource>/schema

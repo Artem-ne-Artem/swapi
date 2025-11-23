@@ -19,5 +19,9 @@ API «Звёздных войн», или «swapi» — это источник 
 * Из STG слоя Airflow формирует слой CDM Postgres.
 * На базе CDM слоя MetaBase строит отчёт.
 
+<!-- Смотреть в Metabase:  [Starships Metrics Dashboard](http://localhost:3000/public/dashboard/000607f9-6d26-4495-a0e9-93db833349f6) -->
+[![Open in Metabase](https://img.shields.io/badge/Metabase-Open%20Dashboard-blue)](http://localhost:3000/public/dashboard/000607f9-6d26-4495-a0e9-93db833349f6)
+
+
 Documentation https://swapi.dev/documentation#intro
 Shema: https://swapi.dev/api/<resource>/schema

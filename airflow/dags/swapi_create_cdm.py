@@ -7,7 +7,7 @@ logger = get_logger()
 
 
 def get_engine():
-    """Возвращает SQLAlchemy engine для Postgres."""
+    """Возвращает SQLAlchemy engine для Postgres"""
     host=DB_CONN["host"]
     port=DB_CONN["port"]
     user=DB_CONN["user"]
@@ -19,6 +19,7 @@ def get_engine():
 
 
 def get_create_cdm_metric_leaders():
+    """Создаёт таблицу(ы) слоя CDM"""
     engine = get_engine()
     full_table = f"cdm.metric_leaders"
     with engine.begin() as conn:

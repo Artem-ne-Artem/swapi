@@ -3,7 +3,7 @@ import psycopg2
 
 
 def get_connection(database=None):
-    """Возвращает подключение к Postgres."""
+    """Возвращает подключение к Postgres"""
     return psycopg2.connect(
         host=DB_CONN["host"],
         port=DB_CONN["port"],

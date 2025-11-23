@@ -7,7 +7,7 @@ logger = get_logger()
 
 
 def get_engine():
-    """Возвращает SQLAlchemy engine для Postgres."""
+    """Возвращает SQLAlchemy engine для Postgres"""
     host=DB_CONN["host"]
     port=DB_CONN["port"]
     user=DB_CONN["user"]
@@ -19,6 +19,7 @@ def get_engine():
 
 
 def get_create_stg_vehicles():
+    """Создаёт таблицу vehicles слоя STG"""
     engine = get_engine()
     full_table = f"stg.vehicles"
     with engine.begin() as conn:
@@ -104,6 +105,7 @@ def get_create_stg_vehicles():
 
 
 def get_create_stg_planets():
+    """Создаёт таблицу planets слоя STG"""
     engine = get_engine()
     full_table = f"stg.planets"
     with engine.begin() as conn:
@@ -185,6 +187,7 @@ def get_create_stg_planets():
 
 
 def get_create_stg_films():
+    """Создаёт таблицу films слоя STG"""
     engine = get_engine()
     full_table = f"stg.films"
     with engine.begin() as conn:
@@ -311,6 +314,7 @@ def get_create_stg_films():
 
 
 def get_create_stg_people():
+    """Создаёт таблицу people слоя STG"""
     engine = get_engine()
     full_table = f"stg.people"
     with engine.begin() as conn:
@@ -441,6 +445,7 @@ def get_create_stg_people():
 
 
 def get_create_stg_species():
+    """Создаёт таблицу species слоя STG"""
     engine = get_engine()
     full_table = f"stg.species"
     with engine.begin() as conn:
@@ -539,6 +544,7 @@ def get_create_stg_species():
 
 
 def get_create_stg_starships():
+    """Создаёт таблицу starships слоя STG"""
     engine = get_engine()
     full_table = f"stg.starships"
     with engine.begin() as conn:

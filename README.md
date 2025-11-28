@@ -12,12 +12,14 @@ API «Звёздных войн», или «swapi» — это источник 
 * Инфраструктура - Docker
 
 <!-- Смотреть в Metabase:  [Starships Metrics Dashboard](http://localhost:3000/public/dashboard/000607f9-6d26-4495-a0e9-93db833349f6) -->
-[![Open in Metabase](https://img.shields.io/badge/Metabase-Open%20Dashboard-blue)](http://localhost:3000/public/dashboard/000607f9-6d26-4495-a0e9-93db833349f6)
+<!-- [![Open in Metabase](https://img.shields.io/badge/Metabase-Open%20Dashboard-blue)](http://localhost:3000/public/dashboard/000607f9-6d26-4495-a0e9-93db833349f6) -->
+
+![This is an alt text.](/images/swapi_dashboard.jpg "Dashboard")
 
 ### Схема процесса. Обновление данных во всех слоях происходит в формате full refresh.
 ![This is an alt text.](/images/swapi_process_schema.jpg "SWAPI process schema")
 
 
-Documentation https://swapi.dev/documentation#intro
+API Documentation https://swapi.dev/documentation#intro
 
-Shema: https://swapi.dev/api/<resource>/schema
+API Shema: https://swapi.dev/api/<resource>/schema

@@ -1,13 +1,14 @@
 x-airflow-common:
   &airflow-common
   build: .
+  # image: apache/airflow:2.10.5
   environment:
     &airflow-common-env
     AIRFLOW__CORE__EXECUTOR: CeleryExecutor
     AIRFLOW__DATABASE__SQL_ALCHEMY_CONN: postgresql+psycopg2://${POSTGRES_AIRFLOW_USER}:${POSTGRES_AIRFLOW_PASSWORD}@postgres_airflow/${POSTGRES_AIRFLOW_DB}
     AIRFLOW__CELERY__RESULT_BACKEND: db+postgresql://${POSTGRES_AIRFLOW_USER}:${POSTGRES_AIRFLOW_PASSWORD}@postgres_airflow/${POSTGRES_AIRFLOW_DB}
     AIRFLOW__LOGGING__WORKER_LOG_SERVER_HOST: airflow-worker
-    AIRFLOW__LOGGING__WORKER_LOG_SERVER_PORT: 8793
+    AIRFLOW__LOGGING__WORKER_LOG_SERVER_PORT: 8794
     AIRFLOW__WEBSERVER__WEB_SERVER_HOST: airflow-webserver
     AIRFLOW__CELERY__BROKER_URL: redis://:@redis:6379/0
     AIRFLOW__CORE__FERNET_KEY: ''
@@ -37,9 +38,9 @@ services:
 
   postgres_dwh:
     image: ${POSTGRES_IMAGE}
-    container_name: postgres_db_dwh
+    container_name: sample_db_postgres_dwh
     ports:
-      - "5433:5432"
+      - "5434:5432"
     environment:
       POSTGRES_USER: ${POSTGRES_DWH_USER}
       POSTGRES_PASSWORD: ${POSTGRES_DWH_PASSWORD}
@@ -51,20 +52,13 @@ services:
       retries: 5
     restart: unless-stopped
     volumes:
-      - pg_data:/var/lib/postgresql/data
-
-  adminer:
-    image: adminer:5.4.0
-    container_name: adminer
-    ports:
-      - "8090:8080"
-    restart: unless-stopped
+      - postgres_dwh:/var/lib/postgresql/data
 
   metabase:
     image: metabase/metabase:v0.56.9
-    container_name: metabase
+    container_name: sample_db_metabase
     ports:
-      - "3000:3000"
+      - "3001:3000"
     environment:
       # параметры для подключения служебной БД логов metabase
       MB_DB_TYPE: postgres
@@ -85,7 +79,7 @@ services:
 # инстанс для логов metabase
   postgres_metabase:
     image: ${POSTGRES_IMAGE}
-    container_name: postgres_db_metabase
+    container_name: sample_db_metabase_postgres
     hostname: metabase_db
     ports:
       - "55432:5432"
@@ -102,9 +96,55 @@ services:
     volumes:
       - metabase_postgres_data:/var/lib/postgresql/data
 
+  superset:
+    image: apache/superset:4.1.2
+    container_name: sample_db_superset
+    environment:
+      SUPERSET_ENV: ${SUPERSET_ENV}
+      SUPERSET_SECRET_KEY: ${SUPERSET_SECRET_KEY}
+      SUPERSET_ADMIN_USERNAME: ${SUPERSET_ADMIN_USERNAME}
+      SUPERSET_ADMIN_PASSWORD: ${SUPERSET_ADMIN_PASSWORD}
+      SUPERSET_ADMIN_FIRST_NAME: ${SUPERSET_ADMIN_FIRST_NAME}
+      SUPERSET_ADMIN_LAST_NAME: ${SUPERSET_ADMIN_LAST_NAME}
+      SUPERSET_ADMIN_EMAIL: ${SUPERSET_ADMIN_EMAIL}
+      # По желанию, можно указать базу данных Superset, если используете внешнюю
+      DATABASE_URL: postgresql+psycopg2://superset:superset@superset-db:5432/superset
+      # REDIS_HOST: superset-redis
+      # REDIS_PORT: 6379
+    ports:
+      - "8088:8088"
+    depends_on:
+      - superset-db
+      - superset-redis
+    restart: always
+    command: >
+      /bin/bash -c "superset db upgrade &&
+      superset fab create-admin --username \"${SUPERSET_ADMIN_USERNAME}\" --password \"${SUPERSET_ADMIN_PASSWORD}\" --firstname \"${SUPERSET_ADMIN_FIRST_NAME}\" --lastname \"${SUPERSET_ADMIN_LAST_NAME}\" --email \"${SUPERSET_ADMIN_EMAIL}\" &&
+      superset init &&
+      superset run -h 0.0.0.0 -p 8088"
+
+# инстанс для логов superset
+  superset-db:
+    image: ${POSTGRES_IMAGE}
+    container_name: sample_db_superset_postgres
+    environment:
+      POSTGRES_DB: superset
+      POSTGRES_USER: superset
+      POSTGRES_PASSWORD: superset
+    volumes:
+      - superset_db_data:/var/lib/postgresql/data
+    restart: always
+
+  superset-redis:
+    image: redis:7
+    container_name: sample_db_superset_redis
+    environment:
+      REDIS_HOST: superset-redis
+      REDIS_PORT: 6379
+    restart: always
+
   postgres_airflow:
     image: ${POSTGRES_IMAGE}
-    container_name: postgres_db_airflow
     environment:
       POSTGRES_USER: ${POSTGRES_AIRFLOW_USER}
       POSTGRES_PASSWORD: ${POSTGRES_AIRFLOW_PASSWORD}
@@ -120,7 +160,6 @@ services:
 
   redis:
     image: redis:7.2-bookworm
-    container_name: redis
     expose:
       - 6379
     healthcheck:
@@ -133,14 +172,14 @@ services:
 
   airflow-webserver:
     <<: *airflow-common
-    container_name: airflow_webserver
+    # container_name: airflow_webserver
     command: webserver
     ports:
-      - "8080:8080"
+      - "8081:8080"
     environment:
       <<: *airflow-common-env
       AIRFLOW__LOGGING__WORKER_LOG_SERVER_HOST: airflow-worker
-      AIRFLOW__LOGGING__WORKER_LOG_SERVER_PORT: 8793
+      AIRFLOW__LOGGING__WORKER_LOG_SERVER_PORT: 8794
     healthcheck:
       test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
       interval: 30s
@@ -157,7 +196,6 @@ services:
 
   airflow-scheduler:
     <<: *airflow-common
-    container_name: airflow_scheduler
     command: scheduler
     healthcheck:
       test: ["CMD", "curl", "--fail", "http://localhost:8974/health"]
@@ -173,7 +211,6 @@ services:
 
   airflow-worker:
     <<: *airflow-common
-    container_name: airflow_worker
     command: celery worker
     healthcheck:
       test:
@@ -186,7 +223,7 @@ services:
     environment:
       <<: *airflow-common-env
       AIRFLOW__LOGGING__WORKER_LOG_SERVER_HOST: airflow-worker
-      AIRFLOW__LOGGING__WORKER_LOG_SERVER_PORT: 8793
+      AIRFLOW__LOGGING__WORKER_LOG_SERVER_PORT: 8794
       DUMB_INIT_SETSID: "0"
     restart: always
     depends_on:
@@ -196,7 +233,6 @@ services:
 
   airflow-triggerer:
     <<: *airflow-common
-    container_name: airflow_triggerer
     command: triggerer
     healthcheck:
       test: ["CMD-SHELL", 'airflow jobs check --job-type TriggererJob --hostname "$${HOSTNAME}"']
@@ -212,7 +248,6 @@ services:
 
   airflow-init:
     <<: *airflow-common
-    container_name: airflow_init
     entrypoint: /bin/bash
     command:
       - -c
@@ -296,7 +331,7 @@ services:
     profiles:
       - flower
     ports:
-      - "5555:5555"
+      - "5556:5555"
     healthcheck:
       test: ["CMD", "curl", "--fail", "http://localhost:5555/"]
       interval: 30s
@@ -311,7 +346,8 @@ services:
 
 
 volumes:
-  pg_data:
+  postgres_dwh:
   metabase_data:
   metabase_postgres_data:
   postgres_airflow_data:
+  superset_db_data:
